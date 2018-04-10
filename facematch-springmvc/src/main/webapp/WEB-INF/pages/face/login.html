@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ZH-CN">
+<head>
+  <meta charset="utf-8">
+  <title>登录</title>
+  <script src="/facematch-springmvc/tool/js/jquery-3.2.1.min.js"></script>
+   <script src="/facematch-springmvc/tool/js/tool.js"></script>
+  
+  <style>
+    .booth {
+      width:400px;
+     
+      background:#ccc;
+      border: 10px solid #ddd;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="booth">
+    <video id="video" width="400" height="300"></video>
+    <button id='opencamera'>打开摄像头</button>
+     <button id='close'>关闭摄像头</button>
+    <button id='tack'> snap shot</button>
+    <canvas id='canvas' width='400' height='300'></canvas>
+    <img id='img' src=''>
+  </div>
+ 
+ 
+  <script>
+  var opencamera = document.getElementById('opencamera');
+  var close = document.getElementById('close');
+  var mediaStreamTrack;
+   //var colse = document.getElementById('colse');
+  function camera(){
+	    var video = document.getElementById('video'),
+	        canvas = document.getElementById('canvas'),
+	        snap = document.getElementById('tack'),
+	        img = document.getElementById('img'),
+	        vendorUrl = window.URL || window.webkitURL;
+	        
+	    //媒体对象
+/* 	    navigator.getMedia = navigator.getUserMedia ||
+	                         navagator.webkitGetUserMedia ||
+	                         navigator.mozGetUserMedia ||
+	                         navigator.msGetUserMedia;
+	    navigator.getMedia({
+	        video: true, //使用摄像头对象
+	        audio: false  //不适用音频
+	    }, function(strem){
+	        console.log(strem);
+	        mediaStreamTrack =strem;
+	        video.src = vendorUrl.createObjectURL(strem);
+	        video.play();
+	    }, function(error) {
+	        //error.code
+	        console.log(error);
+	    });
+	  */   
+	   navigator.getUserMedia = navigator.getUserMedia ||  
+        navigator.webkitGetUserMedia ||  
+        navigator.mozGetUserMedia;  
+        if (navigator.getUserMedia) {  
+            navigator.getUserMedia({ audio: true, video: { width: 320, height: 320 } },  
+                    function(stream) {  
+                     console.log(stream);
+                     mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];  
+                        video.src = vendorUrl.createObjectURL(stream);  
+                        video.play();  
+                    },  
+                    function(err) {  
+                        console.log("The following error occurred: " + err.name);  
+                    }  
+            );  
+        } else {  
+            console.log("getUserMedia not supported");  
+        }  
+	
+    
+    snap.addEventListener('click', function(){
+    
+        //绘制canvas图形
+        canvas.getContext('2d').drawImage(video, 0, 0, 400, 300);
+        
+         var snapData = canvas.toDataURL("image/jpeg");
+		
+        //把canvas图像转为img图片
+        img.src = snapData;
+        handleSave(snapData);
+        
+    })
+    }
+    
+    opencamera.addEventListener('click', function(){
+        camera();
+    });
+    
+    close.addEventListener('click', function() {
+        mediaStreamTrack && mediaStreamTrack.stop();
+    }, false);
+   
+  </script>
+</body>
+</html>
+
